@@ -1,3 +1,4 @@
+import { Dalle } from 'node-dalle2';
 import db from './db/db.js';
 import express from "express"; // module: import from - export, commonjs: require - module.exports = db
 import bcrypt from 'bcrypt';
@@ -8,7 +9,7 @@ import bulk from './db/bulk.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const port = 8080;
+const port = process.env.PORT || 8080;
 const app = express();
 
 bulk(db);
@@ -19,7 +20,11 @@ app.listen(port, () => {
   console.log(`Servidor Express iniciado en el puerto ${port}`);
 });
 
-const API_AUTH_URL = "/api/auth"
+const API_AUTH_URL = "/api/auth";
+
+app.get('/', (req, res) => {
+  res.send('Hello World from Server');
+});
 
 // post es una funcion de un objeto,que recibe 2 parametros string (RUTA),callback (funcion)
 app.post(
@@ -144,18 +149,30 @@ app.get(`/api/gpt/:button`,
         break;
         case 3:
           // Y despues el envio de la prompt
-        limits = '';
-        query = `
-          nombrame 10 autos con estas letras:${limits}
-      
+        limits = 'quiero hacer un dibujo de esta historia,sacame datos importantes para enviarselo a dalle: ';
+        query = `${limits}
           ${prompt}
-      
           
         `;
-
+        break;
       }
       
     chatgptResponse = await chatgpt.sendMessage(query);
-    res.status(200).send(chatgptResponse);
+
+    let dalleResponse = null;
+    if (Number(button) === 3) {
+      const dalle = new Dalle({
+        apiKey: process.env.API_KEY_GPT
+      });
+
+      dalleResponse = await dalle.generate(chatgptResponse.text);
+      dalleResponse = dalleResponse.data; // [img1, img2, img3, img4]
+    }
+
+    if (dalleResponse) {
+      res.status(200).send(dalleResponse);
+    } else {
+      res.status(200).send(chatgptResponse);
+    }
   }
 );
