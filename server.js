@@ -10,6 +10,18 @@ dotenv.config();
 const port = 8080;
 const app = express();
 
+db.query(
+  `
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      name TEXT,
+      lastname TEXT,
+      email TEXT,
+      password TEXT
+    );
+  `
+);
+
 app.use(express.json()); // Va a usar un middleware
 app.use(cors());
 app.listen(port, () => {
