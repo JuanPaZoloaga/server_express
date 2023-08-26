@@ -3,7 +3,7 @@ import db from './db/db.js';
 import express from "express"; // module: import from - export, commonjs: require - module.exports = db
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { ChatGPTAPI } from "chatgpt";
+// import { ChatGPTAPI } from "chatgpt";
 import cors from 'cors';
 import bulk from './db/bulk.js';
 import dotenv from 'dotenv';
@@ -114,12 +114,12 @@ app.get(`/api/gpt/:button`,
     const {button} = req.params; // 
 
     // Configuracion de la API KEY
-    const chatgpt = new ChatGPTAPI({
-      apiKey: process.env.API_KEY_GPT,
-      completionParams:{
-        model: `gpt-3.5-turbo`,
-      }
-    });
+    // const chatgpt = new ChatGPTAPI({
+    //   apiKey: process.env.API_KEY_GPT,
+    //   completionParams:{
+    //     model: `gpt-3.5-turbo`,
+    //   }
+    // });
     // String(button) // string
     // Number(button) // number
     // Array(button)
@@ -157,7 +157,7 @@ app.get(`/api/gpt/:button`,
         break;
       }
       
-    chatgptResponse = await chatgpt.sendMessage(query);
+    // chatgptResponse = await chatgpt.sendMessage(query);
 
     let dalleResponse = null;
     if (Number(button) === 3) {
@@ -165,14 +165,15 @@ app.get(`/api/gpt/:button`,
         apiKey: process.env.API_KEY_GPT
       });
 
-      dalleResponse = await dalle.generate(chatgptResponse.text);
+      dalleResponse = await dalle.generate(prompt);
       dalleResponse = dalleResponse.data; // [img1, img2, img3, img4]
     }
 
-    if (dalleResponse) {
-      res.status(200).send(dalleResponse);
-    } else {
-      res.status(200).send(chatgptResponse);
-    }
+    res.status(200).send(dalleResponse);
+    // if (dalleResponse) {
+    //   res.status(200).send(dalleResponse);
+    // } else {
+    //   res.status(200).send(chatgptResponse);
+    // }
   }
 );
