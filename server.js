@@ -59,7 +59,7 @@ app.post(
       const [rows2] = await db.query('SELECT * FROM users WHERE email = ?;', [email]);
       const idUser = rows2[0].id;
 
-      const token = jwt.sign(idUser, process.env.PASSWORD_TOKEN); // cat1234 : contraseña
+      const token = jwt.sign(idUser, process.env.PASSWORD_TOKEN);
       response.send(token)
     } catch(err) {
       console.log(err.message);
@@ -84,7 +84,7 @@ app.post(`${API_AUTH_URL}/login`,
         if(compare){
           console.log("iguales");
           const idUser = rows[0];        
-          const token = jwt.sign(idUser, process.env.PASSWORD_TOKEN); // cat1234 : contraseña
+          const token = jwt.sign(idUser, process.env.PASSWORD_TOKEN);
           res.json({ token: token });
         } else{
           console.log("no iguales")
@@ -107,7 +107,7 @@ app.get(`/api/gpt/:button`,
 
     // Configuracion de la API KEY
     const chatgpt = new ChatGPTAPI({
-      apiKey: `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`,
+      apiKey: process.env.API_KEY_GPT,
       completionParams:{
         model: `gpt-3.5-turbo`,
       }
