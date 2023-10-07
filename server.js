@@ -3,7 +3,7 @@ import db from './db/db.js';
 import express from "express"; // module: import from - export, commonjs: require - module.exports = db
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-// import { ChatGPTAPI } from "chatgpt";
+import { ChatGPTAPI } from "chatgpt";
 import cors from 'cors';
 import bulk from './db/bulk.js';
 import dotenv from 'dotenv';
@@ -108,18 +108,20 @@ app.post(`${API_AUTH_URL}/login`,
     }
   }
 );
+
 app.get(`/api/gpt/:button`, 
   async (req, res) => {
+    try {
     const {prompt} = req.query; // Sueño button = 1 o 2 o 3
     const {button} = req.params; // 
 
     // Configuracion de la API KEY
-    // const chatgpt = new ChatGPTAPI({
-    //   apiKey: process.env.API_KEY_GPT,
-    //   completionParams:{
-    //     model: `gpt-3.5-turbo`,
-    //   }
-    // });
+    const chatgpt = new ChatGPTAPI({
+      apiKey: process.env.API_KEY_GPT,
+      completionParams:{
+        model: `gpt-4`,
+      }
+    });
     // String(button) // string
     // Number(button) // number
     // Array(button)
@@ -155,25 +157,31 @@ app.get(`/api/gpt/:button`,
           
         `;
         break;
+        case 4:
+          query=`${prompt}`;
+          break;
       }
       
-    // chatgptResponse = await chatgpt.sendMessage(query);
+    chatgptResponse = await chatgpt.sendMessage(query);
 
     let dalleResponse = null;
     if (Number(button) === 3) {
       const dalle = new Dalle({
-        apiKey: process.env.API_KEY_GPT
+        apiKey: "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"
       });
 
-      dalleResponse = await dalle.generate(prompt);
-      dalleResponse = dalleResponse.data; // [img1, img2, img3, img4]
+      dalleResponse = await dalle.generate(chatgptResponse);
+      console.log(chatgptResponse);
+      dalleResponse = dalleResponse.data;
     }
 
-    res.status(200).send(dalleResponse);
-    // if (dalleResponse) {
-    //   res.status(200).send(dalleResponse);
-    // } else {
-    //   res.status(200).send(chatgptResponse);
-    // }
+    if (dalleResponse) {
+      res.status(200).json({ dalleResponse });
+    } else {
+      res.status(200).json({ chatgptResponse });
+    }
+    } catch(err) {
+      console.log(err.message);
+    }
   }
 );
