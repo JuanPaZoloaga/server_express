@@ -111,6 +111,11 @@ app.post(`${API_AUTH_URL}/login`,
 
 app.get(`/api/gpt/:button`, 
   async (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "*")
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Max-Age", "1800");
+    res.setHeader("Access-Control-Allow-Headers", "content-type");
+
     try {
     const {prompt} = req.query; // Sueño button = 1 o 2 o 3
     const {button} = req.params; // 
