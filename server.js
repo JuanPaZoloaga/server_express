@@ -26,6 +26,10 @@ app.get('/', (req, res) => {
   res.send('Hello World from Server');
 });
 
+app.get('/api/probe', (req, res) => {
+  res.json({ message: 'PROBE FROM SERVER JSON' });
+});
+
 // post es una funcion de un objeto,que recibe 2 parametros string (RUTA),callback (funcion)
 app.post(
   `${API_AUTH_URL}/register`, // Literal String
